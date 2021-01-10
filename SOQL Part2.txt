@@ -1,0 +1,57 @@
+// Functions in SOQL
+
+1.toLabel -  Organizations with translation workbench enabled can use the toLabel to get translated values
+  SELECT Name, toLabel(Industry) FROM Account
+
+2.GROUP BY - 
+SELECT City__c, Count(Employee_Name__c) FROM Employee__c GROUP BY City__c
+Note -  All the fields other than the count of employee name should be group by.
+
+3.Count Function
+Integer count = [SELECT COUNT() FROM Account WHERE Industry = 'Agriculture'];
+System.debug('count'+count);
+
+4.Count(Field)
+List<AggregateResult> accList = [SELECT COUNT(Name) indus,Industry FROM Account WHERE Industry = 'Agriculture' Group By Industry];
+System.debug('count'+accList[0].get('indus'));
+COUNT_DISTINCT() - used to find the number of distinct non null field values in query criteria
+
+5.MIN() - used to return the minimum value of the x field
+SELECT MIN (FIELD_NAME) FROM Object_API_Name
+SELECT MIN(Age__c) MinAge, City__c FROM Employee__c GROUP BY City__c
+
+6.MAX() - used to return the maximum value of the x field.
+SELECT MAX(Age__c) MaxAge, City__c FROM Employee__c GROUP BY City__c
+
+7.SUM() - The SUM() method is used to find the total of the specified numeric field.
+SELECT SUM(Age__c) MaxAge, City__c FROM Employee__c GROUP BY City__c
+
+8.Having Clause - 
+Select Count(Id) accID, Industry From Account Group By Industry Having Count(Id) >= 2
+
+List<AggregateResult> accList = [Select Count(Id) accID, Industry From Account Group By Industry Having Count(Id) >= 2];
+System.debug('count'+accList[1].get('accID'));
+accList[1] - accList[0] consists of all the null values that are grounped hence used accList[1]..
+
+-----------------------------------------------------------------------------------------------------------------------
+
+Limitations and Best Practices 
+
+Write SELECT, FROM, WHERE, HAVING, IN, and so on in uppercase.
+If we want to use a single quote inside our SOQL statement, we will have to use a
+backslash followed by a single quote. This is called as an escape sequence.
+Escape sequences in SOQL page 91.
+
+Using ID in SOQL helps in indexing.
+Salesforce Record ID via Apex is 18 digit case in-sensitive
+Limitations of standard objects outlined in page 80
+
+Indexing a field (indexing improves query performance) in SF - 
+Making a field external ID will make the field indexed and we can also reach out to customer support to make a field indexed
+
+
+
+
+
+
+

@@ -1,0 +1,149 @@
+SOQL Basics From Packt Publishing
+// SOQL CheatSheet - https://www.salesforceben.com/soql-cheat-sheet/
+
+SOQL Syntax - 
+
+SELECT fields FROM Object 
+WHERE Condition 
+Ordering LIMIT 
+FOR VIEW Or FOR REFERENCE 
+OFFSET UPDATE VIEWSTAT
+-----------------------------------------------------------------------------------------------------------
+
+1 - Generic constituents of an SOQL Query 
+    SELECT fields FROM Object WHERE Condition Ordering LIMIT FOR VIEW Or FOR REFERENCE OFFSET UPDATE VIEWSTAT
+
+2 - SOQL Reserved Keywords are
+    AND, ASC, DESC, EXCLUDES, FIRST, FROM, GROUP, HAVING, IN, INCLUDES, LAST, LIKE, LIMIT, NOT, NULL, NULLS, OR, SELECT, WHERE, and WITH
+
+3 - Example of Alias
+    SELECT Acct.Id, Acct.Name FROM Account Acct
+
+    Querying and filtering by the parent record name using alias - 
+    select firstname, lastname from contact con, con.Account acct where acct.name = 'Cloudbyz'
+
+    Querying and filtering by the parent record name using relationship query  - 
+    select firstname, lastname, Account.Name from contact where Account.Name = 'Cloudbyz'
+
+
+4 - Conditional Clauses 
+    
+    Where Clause - 
+    SELECT FirstName, LastName FROM Contact WHERE FirstName != null
+
+    Comparision Operators - 
+    = Equals ,!= Not equals ,< Less than ,<= Less than or equal to ,> Greater than ,>= Greater than or equal to ,LIKE Like
+    =, !=, <, >, <=, >=, LIKE - Different Operators
+
+    Example of Like Operator
+    SELECT Name, Amount FROM Opportunity WHERE Name LIKE 'Test%' // '%' is mandatory and without that it wont match any data
+    -TIP - %Test% To query with any name that includes test in it.( either at the start or at the end of  string )
+
+    IN operator
+    select firstname, lastname from contact where firstname IN ('Shravan','Carol','Rose')
+
+    NOT IN Operator
+    select firstname, lastname from contact where firstname NOT IN ('Shravan','Carol','Rose')
+
+    AND Operator Example
+    SELECT Name, Amount FROM Opportunity where Amount > 1000 AND Amount < 100000
+
+    OR Operator Example
+    Select id , name from Account where name = 'Cloudbyz' OR name = 'Naveen'
+
+    Order By Clause
+    SELECT Name,Id FROM Opportunity Order By Name Asc
+    Sorting in both Asc and Desc
+    SELECT Name, Industry FROM Account ORDER By Name ASC, Industry DESC
+    Order By is limited to 32 fields 
+
+    Advanced SOQL Statements
+
+5 - Relationship Queries
+    Parent To Child Query 
+    Standard object
+    SELECT Id, Name, (SELECT Id, Name FROM Contacts) FROM Account
+    For a custom object is as below
+    SELECT Employee_Name__c, (SELECT Id, Name FROM Hobbies__r) FROM Employee__c 
+    (Appemd child relationship name with __r)
+    (page 49 - SOQL Book To find the relationship name - goto the child and then in the lookup to the parent find the child relationship name - this gives the desired value - https://www.sfdcpoint.com/salesforce/relationship-query-apex-salesforce/ )
+
+    Child to Parent Query
+    For a standard object
+        Select ID, Account.Name, Account.Id From Case where ID = '5002800000SsHTg'
+    For a Custom Object
+        Select Id, Candidates__r.Name from Job_Application__c
+
+    
+    The INCLUDES and EXCLUDES Operator
+    Used to filter data from a field with the datatype Multi Picklist 
+    SELECT Employee_Name__c, Skills__c FROM Employee__c WHERE Skills__c INCLUDES ('C', 'C#')
+    SELECT Employee_Name__c, Skills__c FROM Employee__c WHERE Skills__c EXCLUDES ('C', 'C#', '')
+
+6 - The Escape Sequences
+
+    Page - 54 , SOQL Book 
+    SELECT Id, Name FROM Account where name = 'Isbol\'s Bulk Company' (\ is used to escape ' from the name)
+
+7 - The Date Formats in SOQL   
+
+    YYYY-MM-DD 1999-01-01
+    YYYY-MM-DDThh:mm:ss+hh:mm 1999-01-01T23:01:01+01:00(OFFSET doesnt seem to work more insight needed)
+    YYYY-MM-DDThh:mm:ss-hh:mm 1999-01-01T23:01:01-08:00(OFFSET doesnt seem to work more insight needed)
+    YYYY-MM-DDThh:mm:ssZ 1999-01-01T23:01:01Z
+
+SELECT Id, Name, SLAExpirationDate__c,AccountActivationTime__c FROM Account where name = 'Isbol\'s Bulk Company' AND AccountActivationTime__c = 2020-10-16T21:39:00z
+
+http://eltoro.force.com/SoqlFilterByDateDateTimeField -is a good Reference point for more on dates in apex
+
+8 - Date Literals
+
+    YESTERDAY,TODAY etc - Page 57 in SOQL book has more details
+
+9 - Group By RollUp Clause
+SELECT City__c, State__c, COUNT(Employee_Name__c) Counts FROM Employee__c GROUP BY ROLLUP(City__c, State__c)
+SELECT Id,Phone,Count(Industry) counts FROM Account WHERE pHONE != NULL Group By ROLLUP(Phone, ID)
+
+10 - For Reference Clause
+SELECT Id,Industry, LastReferencedDate FROM Account FOR REFERENCE
+
+11 - For View Clause
+SELECT Id,Industry, LastViewedDate FROM Account FOR VIEW
+
+12 - Group By Cube Clause
+SELECT Count(Id) IdCount, Industry, Grouping(Industry), Type, Grouping(Type) Indus FROM Account group by cube(Industry, Type)
+Gives the count of Id's grouped by combinations of Industry and Type
+
+13 - OFFSET Clause
+    SELECT Name FROM Account OFFSET 100
+    Fetches query starting from 100
+    SELECT Name FROM Account OFFSET 100 LIMIT 50
+Salesforce.com recommends that we use the ORDER BY clause whenever we use
+OFFSET. Using the ORDER BY clause along with OFFSET ensures that the ordering
+of the result set is consistent.
+OFFSET limit is 2,000 rows
+
+
+References for a later use : 
+https://medium.com/salesforce-zolo/what-every-salesforce-developer-should-know-about-dates-and-times-in-apex-d49bc0a116d4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+    
+    
+    
+
+
